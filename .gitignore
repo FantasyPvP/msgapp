@@ -1,0 +1,5 @@
+*/target/*
+*/ssl/*
+*/Rocket.toml
+*/secrets/*
+*/.env
