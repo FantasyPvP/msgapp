@@ -1,9 +1,19 @@
 use rand::{thread_rng, Rng};
+use reqwest::header::ACCESS_CONTROL_REQUEST_HEADERS;
+use rocket::http::CookieJar;
+use sha2::digest::typenum::False;
 use sha2::{Digest, Sha256};
+use std::arch::x86_64::_CMP_TRUE_UQ;
+use std::env;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use argon2::{
+    password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+    Argon2,
+};
+
 use rocket::{
-    http::Status,
+    http::{Cookie, SameSite, Status},
     request::{self, FromRequest, Outcome, Request},
     response::{Redirect, Responder},
     serde::{json::Json, Deserialize, Serialize},
@@ -15,6 +25,11 @@ use rocket_db_pools::{
 };
 use rocket_dyn_templates::{context, Template};
 
+use jsonwebtoken::{
+    decode, encode, errors::Error, Algorithm, DecodingKey, EncodingKey, Header, TokenData,
+    Validation,
+};
+
 use crate::DbInterface;
 
 /*
@@ -25,13 +40,18 @@ AUTH TOKEN GUARD - uses a cookie to check users are authenticated before proceed
 #[derive(Debug)]
 pub struct AuthTokenGuard(i64); // the contained data is the user_id
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims {
+    user_id: i64,
+}
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AuthTokenGuard {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
-        if let Some(cookie) = request.cookies().get("session_token") {
-            let pool = match request.guard::<&State<sqlx::SqlitePool>>().await {
+        if let Some(cookie) = request.cookies().get_private("session_token") {
+            let pool = match request.guard::<&State<DbInterface>>().await {
                 Outcome::Success(pool) => pool,
                 _ => return Outcome::Error((Status::InternalServerError, ())),
             };
@@ -40,7 +60,7 @@ impl<'r> FromRequest<'r> for AuthTokenGuard {
             if let Some(token) = sqlx::query_as!(SessionToken,
                 "SELECT token_id, token, created_at, expires_at, user_id FROM SessionToken WHERE token = ?",
                 value
-            ).fetch_optional(&**pool).await.expect("SQL QUERY FAILED") {
+            ).fetch_optional(&***pool).await.expect("SQL QUERY FAILED") {
                 return Outcome::Success(AuthTokenGuard(token.user_id))
             }
         }
@@ -70,7 +90,7 @@ impl SessionToken {
         println!("{}", hashed);
 
         SessionToken {
-            token_id: Some(2),
+            token_id: None,
             token: String::new(),
             created_at: current_time.as_secs() as i64,
             expires_at: Some((current_time + expiry).as_secs() as i64),
@@ -94,18 +114,76 @@ struct LoginResponse {
 }
 
 #[post("/login", data = "<form>")]
-pub fn api_login<'a>(
+pub async fn api_login<'a>(
     mut db: Connection<DbInterface>,
     form: Json<LoginForm>,
     _c: BrowserClient,
-) -> Redirect {
-    println!("{} {}", form.username, form.password);
-    Redirect::to("/")
+    jar: &CookieJar<'_>,
+) -> Option<Redirect> {
+    if login_logic(jar, form, db).await {
+        Some(Redirect::to("/"))
+    } else {
+        None
+    }
 }
 
 #[post("/login", data = "<form>", rank = 2)]
-pub fn api_login_nonbrowser(mut db: Connection<DbInterface>, form: Json<LoginForm>) -> String {
-    String::from("done")
+pub async fn api_login_nonbrowser(
+    mut db: Connection<DbInterface>,
+    form: Json<LoginForm>,
+    jar: &CookieJar<'_>,
+) -> String {
+    if login_logic(jar, form, db).await {
+        String::from("ok")
+    } else {
+        String::from("rejected")
+    }
+}
+
+async fn login_logic(
+    jar: &CookieJar<'_>,
+    form: Json<LoginForm>,
+    mut db: Connection<DbInterface>,
+) -> bool {
+    println!("logging in...");
+
+    let (pass_hash, user_id): (String, i64) = match sqlx::query!(
+        "SELECT user_id, pass_hash FROM User WHERE user_name = ?",
+        form.username
+    )
+    .fetch_optional(&mut **db)
+    .await
+    .unwrap()
+    {
+        Some(record) => (
+            record.pass_hash.expect("all users should have a pass hash"),
+            record.user_id,
+        ),
+        _ => return false,
+    };
+
+    let hash = PasswordHash::new(&pass_hash).expect("unable to generate hash");
+
+    if let Ok(_) = Argon2::default().verify_password(form.password.as_bytes(), &hash) {
+        let token = SessionToken::new(user_id);
+
+        sqlx::query!(
+            "INSERT INTO SessionToken (token, created_at, expires_at, user_id) VALUES (?, ?, ?, ?)",
+            token.token,
+            token.created_at,
+            token.expires_at,
+            token.user_id
+        )
+        .execute(&mut **db)
+        .await
+        .unwrap();
+
+        jar.add_private(("session_token", token.token));
+
+        true
+    } else {
+        false
+    }
 }
 
 #[derive(Serialize, Deserialize)]

@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 use rand;
 use rocket::response::content::RawHtml;
 use rocket::response::Redirect;
@@ -15,6 +16,8 @@ use std::{
     sync::Arc,
     time::{SystemTime, UNIX_EPOCH},
 };
+
+use figment::{providers::Env, Figment};
 
 use aes_gcm::{
     aead::{Aead, AeadCore, KeyInit, OsRng},
@@ -39,8 +42,13 @@ struct DbInterface(sqlx::SqlitePool);
 
 #[launch]
 async fn launch() -> _ {
-    let allowed_origins =
-        AllowedOrigins::some_exact(&["https://localhost:8000", "http://localhost:8000", "https://fantasypvp.uk"]);
+    dotenv().ok();
+
+    let allowed_origins = AllowedOrigins::some_exact(&[
+        "https://localhost:8000",
+        "http://localhost:8000",
+        "https://fantasypvp.uk",
+    ]);
 
     let options = CorsOptions {
         allowed_origins,
@@ -61,7 +69,10 @@ async fn launch() -> _ {
 
     println!("tests passed");
 
-    rocket::build()
+    let secret_key = env::var("JWT_TOKEN").expect("token not found in .env");
+    let figment = rocket::Config::figment().merge(("secret_key", secret_key));
+
+    rocket::custom(figment)
         .attach(options)
         .attach(DbInterface::init())
         .attach(Template::fairing())
@@ -75,7 +86,7 @@ async fn launch() -> _ {
                 routes::accounts::signup
             ],
         )
-        .mount("/", routes![auth::user_login_page])
+        .mount("/", routes![auth::user_login_page, index])
         .register("/", catchers![not_found, internal_error, not_authorized])
 }
 
@@ -107,6 +118,7 @@ fn asymmetric_encryption_test() {
     let bits = 2048;
     let priv_key = RsaPrivateKey::new(&mut rng, bits).expect("failed to generate a key");
     let pub_key = RsaPublicKey::from(&priv_key);
+
     let data = b"hello world";
 
     let enc_data = pub_key
@@ -145,6 +157,11 @@ fn test(g: AuthTokenGuard) -> &'static str {
 #[get("/html")]
 fn gethtml() -> RawHtml<&'static str> {
     RawHtml("<h1>bruh</h1>")
+}
+
+#[get("/")]
+fn index() -> RawHtml<&'static str> {
+    RawHtml("<h1>fantasypvp.uk</h1>")
 }
 
 #[catch(404)]

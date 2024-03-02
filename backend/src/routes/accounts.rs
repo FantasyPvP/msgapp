@@ -4,12 +4,18 @@ use rocket::{
     request::{self, FromRequest, Outcome, Request},
     serde::{json::Json, Deserialize, Serialize},
 };
+use rsa::rand_core::OsRng;
 use std::fs::read_to_string;
 use tracing::{event, Level};
 
 use rocket_db_pools::{
     sqlx::{self, Row},
     Connection,
+};
+
+use argon2::{
+    password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+    Argon2,
 };
 
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -70,7 +76,12 @@ pub async fn signup(
         .expect("time went backwards")
         .as_secs() as i64;
 
-    let pass_hash = String::from("test hash");
+    let salt = SaltString::generate(&mut OsRng);
+    let argon = Argon2::default();
+    let pass_hash = argon
+        .hash_password(req.password.as_bytes(), &salt)
+        .unwrap()
+        .to_string();
 
     sqlx::query!(
         "

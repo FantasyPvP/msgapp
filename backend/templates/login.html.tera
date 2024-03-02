@@ -6,13 +6,13 @@
 </head>
 <body style="display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
     <div style="display: flex; flex-direction: column; align-items: center;">
-        <form id="loginForm" style="border: 1px solid #000; padding: 20px; text-align: center;">
+        <form id="loginForm" onsubmit="submitLoginForm(event)" style="border: 1px solid #000; padding: 20px; text-align: center;">
             <h2>Login</h2>
-            <input type="text" id="username" placeholder="Username" style="margin-bottom: 15px; padding: 10px;">
+            <input type="text" id="username" name="username" placeholder="Username" style="margin-bottom: 15px; padding: 10px;">
             <br>
-            <input type="password" id="password" placeholder="Password" style="margin-bottom: 15px; padding: 10px;">
+            <input type="password" id="password" name="password" placeholder="Password" style="margin-bottom: 15px; padding: 10px;">
             <br>
-            <button type="button" onclick="submitForm()" style="padding: 10px 20px;">Submit</button>
+            <button type="submit" style="padding: 10px 20px;">Submit</button>
             <br>
             <a href="#" style="text-decoration: none; color: blue;">Forgot Password</a>
         </form>        
@@ -21,24 +21,36 @@
         </div>
     </div>    
     <script>
-        function submitForm() {
+        function submitLoginForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Extract the username and password from the form
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const data = { username, password };
 
+            // Create a JSON object with the extracted data
+            const formData = {
+                username: username,
+                password: password
+            };
+
+            // Send the form data to the server as JSON
             fetch('/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(formData)
             })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('result').innerText = JSON.stringify(data);
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url; // Redirect to the new location if given the redirect signal by the server
+                } else {
+                    console.log('Login successful'); // Handle login success
+                }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error:', error); // Handle any errors
             });
         }
     </script>
