@@ -3,23 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <title>Login</title>
-</head>
-<body style="display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
-    <div style="display: flex; flex-direction: column; align-items: center;">
-        <form id="loginForm" onsubmit="submitLoginForm(event)" style="border: 1px solid #000; padding: 20px; text-align: center;">
-            <h2>Login</h2>
-            <input type="text" id="username" name="username" placeholder="Username" style="margin-bottom: 15px; padding: 10px;">
-            <br>
-            <input type="password" id="password" name="password" placeholder="Password" style="margin-bottom: 15px; padding: 10px;">
-            <br>
-            <button type="submit" style="padding: 10px 20px;">Submit</button>
-            <br>
-            <a href="#" style="text-decoration: none; color: blue;">Forgot Password</a>
-        </form>        
-        <div style="margin-top: 20px;">
-          <a href="/">Home</a>
-        </div>
-    </div>    
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<link href="/assets/style.css" rel="stylesheet">
     <script>
         function submitLoginForm(event) {
             event.preventDefault(); // Prevent the default form submission
@@ -54,5 +39,24 @@
             });
         }
     </script>
+</head>
+<body>
+    <div class="fixed flex inset-0 justify-center bg-black z-[-1]">
+		<div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div>
+	</div>
+
+    <div class="text-white" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="bg-opacity-20 bg-black flex flex-col gap-5 p-10 rounded-2xl m-auto">
+            <form class="flex flex-col p-10 gap-5 text-center" id="loginForm" onsubmit="submitLoginForm(event)">
+                <div class="text-xl">Login</div>
+                <div class="h-3"></div>
+                <input class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="text" id="username" name="username" placeholder="Username">
+                <input class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="password" id="password" name="password" placeholder="Password">  
+                <button class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="submit">Submit</button>
+                <a href="#" class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md">Forgot Password</a>
+                <a href="/" class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md">Home</a>
+            </form>        
+        </div>    
+    </div>
 </body>
 </html>

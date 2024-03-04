@@ -53,15 +53,15 @@
 </head>
 <body>
 	<div class="fixed flex inset-0 justify-center bg-black z-[-1]">
-		<div class="bg-gradient-to-b from-indigo-700 via-blue-900 to-slate-900 absolute inset-0">hi</div>
+		<div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div>
 	</div>
 	
 	<div class="text-white" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-		<div class="bg-opacity-20 bg-black flex flex-col gap-5 p-10 rounded-2xl m-auto r">
+		<div class="bg-opacity-20 bg-black flex flex-col gap-5 p-10 rounded-2xl m-auto">
 			{% for message in messages %}
 				{% include "message" %}
 			{% endfor %}
-		<input class="text-base bg-opacity-20 bg-transparent ring-2 p-4 ring-indigo-700 rounded-md" type="text" id="inputField" onkeydown="handleKeyPress(event)" placeholder="Enter a message">
+		<input class="text-base bg-opacity-20 bg-black hover:ring-4 p-4 ring-slate-400 rounded-md" type="text" id="inputField" onkeydown="handleKeyPress(event)" placeholder="Enter a message">
 	</div>
 </body>
 </html>
