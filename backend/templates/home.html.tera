@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Login</title>  
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<link href="/assets/style.css" rel="stylesheet">
+	<script>
+		var socket = new WebSocket('ws://' + window.location.host + '/api/chat');
+        socket.onopen = function(event) {
+            console.log('WebSocket is open now.');
+            // You can send messages here if needed
+        };
+        socket.onmessage = function(event) {
+            console.log('Message received: ' + event.data);
+            // Handle incoming messages here
+        };
+        socket.onclose = function(event) {
+            if (event.wasClean) {
+                console.log('WebSocket closed cleanly');
+            } else {
+                console.error('WebSocket connection closed unexpectedly');
+            }
+            console.log('Code: ' + event.code + ' Reason: ' + event.reason);
+        };
+        socket.onerror = function(error) {
+            console.error('WebSocket error: ' + error.message);
+            // Handle any errors here
+        };
+	
+		function insertMessage(message) {
+ 			// Assuming there's a <div> with id "messageContainer" to hold the messages
+	   		const messageContainer = document.getElementById('messageContainer');
+ 	   		const messageElement = document.createElement('div');
+			messageElement.textContent = message.content; // Assuming the message object has a "content" property
+ 	   		messageContainer.appendChild(messageElement);
+		};
+		function handleKeyPress(event) {
+			console.log("yes");
+      		if (event.key === "Enter") {
+    			// Get the input value
+       			const inputValue = document.getElementById('inputField').value;
+				console.log(inputValue);
+				
+    			if (socket && socket.readyState === WebSocket.OPEN) {
+      				socket.send(JSON.stringify(inputValue));
+    			} else {
+      				console.error("WebSocket connection is not open");	
+				}
+			};
+		};
+	</script>
+</head>
+<body>
+	<div class="fixed flex inset-0 justify-center bg-black z-[-1]">
+		<div class="bg-gradient-to-b from-indigo-700 via-blue-900 to-slate-900 absolute inset-0">hi</div>
+	</div>
+	
+	<div class="text-white" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+		<div class="bg-opacity-20 bg-black flex flex-col gap-5 p-10 rounded-2xl m-auto r">
+			{% for message in messages %}
+				{% include "message" %}
+			{% endfor %}
+		<input class="text-base bg-opacity-20 bg-transparent ring-2 p-4 ring-indigo-700 rounded-md" type="text" id="inputField" onkeydown="handleKeyPress(event)" placeholder="Enter a message">
+	</div>
+</body>
+</html>

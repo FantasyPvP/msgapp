@@ -20,22 +20,6 @@ use argon2::{
 
 use std::time::{SystemTime, UNIX_EPOCH};
 
-pub struct AuthTokenGuard;
-
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for AuthTokenGuard {
-    type Error = ();
-
-    async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
-        if let Some(cookie) = request.cookies().get("auth_token_cookie_name") {
-            if cookie.value() == "expected_auth_token_value" {
-                return Outcome::Success(AuthTokenGuard);
-            }
-        }
-        Outcome::Error((rocket::http::Status::Unauthorized, ()))
-    }
-}
-
 #[post("/signup", data = "<req>")]
 pub async fn signup(
     mut db: Connection<DbInterface>,

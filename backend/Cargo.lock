@@ -196,6 +196,7 @@ dependencies = [
  "rocket_cors",
  "rocket_db_pools",
  "rocket_dyn_templates",
+ "rocket_ws",
  "rsa",
  "serde",
  "serde_json",
@@ -2214,6 +2215,16 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "uncased",
+]
+
+[[package]]
+name = "rocket_ws"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6677b3fe72e2d73dd632c412546ed8153e8685c830ee8d20e4488575cb905d9"
+dependencies = [
+ "rocket",
+ "tokio-tungstenite",
 ]
 
 [[package]]

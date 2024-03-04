@@ -83,10 +83,19 @@ async fn launch() -> _ {
                 test,
                 auth::api_login,
                 auth::api_login_nonbrowser,
-                routes::accounts::signup
+                routes::accounts::signup,
+                routes::messenger::chat,
             ],
         )
-        .mount("/", routes![auth::user_login_page, index])
+        .mount(
+            "/",
+            routes![
+                auth::user_login_page,
+                index,
+                routes::messenger::home,
+                routes::assets::serve_css
+            ],
+        )
         .register("/", catchers![not_found, internal_error, not_authorized])
 }
 
@@ -166,7 +175,7 @@ fn index() -> RawHtml<&'static str> {
 
 #[catch(404)]
 fn not_found(req: &Request) -> Template {
-    Template::render("index", context! {})
+    Template::render("404", context! {})
 }
 
 #[catch(500)]

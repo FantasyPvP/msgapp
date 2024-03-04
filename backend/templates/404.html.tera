@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+  		<meta charset="utf-8" />
+  		<title>Error 404</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; gap: 15px; align-items: center; font-family: 'Source Code Pro', monospace;">
+			<div style="font-size: 56px;">Error 404</div>
+			<div style="font-size: 20px;">Hmm... it appears you have been mislead</div>
+			<div style="font-size: 20px;">
+				<a href="/">Go back to square one.</a>
+			</div>	
+		</div>
+	</body>
+</html>
