@@ -155,6 +155,7 @@ pub async fn signup(
     mut db: Connection<DbInterface>,
     req: Json<SignupData>,
 ) -> Json<SignupResponse> {
+    println!("signing up user {} {}", req.username, req.password);
     match validate_access_token(&req.token) {
         Ok(false) => {
             return Json(SignupResponse {
@@ -183,7 +184,7 @@ pub async fn signup(
             error: Some(e),
         });
     }
-
+    println!("successfully validated username and password...");
     let now = SystemTime::now();
     let join_date = now
         .duration_since(UNIX_EPOCH)
@@ -209,6 +210,7 @@ pub async fn signup(
     )
     .execute(&mut **db)
     .await;
+    println!("signup successful");
 
     Json(SignupResponse {
         token: Some(generate_session_token().to_string()),
