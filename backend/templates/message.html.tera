@@ -10,7 +10,7 @@
        <div class="username text-lg">{{ message.username }}</div>
        <div class="date text-xs">{{ message.date }}</div>
      </div>
-     <div class="message text-base">{{ message.content }}</div>
+     <div class="message text-base p-4">{{ message.content }}</div>
   </div>
   
 </div>
