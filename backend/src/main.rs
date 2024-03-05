@@ -3,7 +3,10 @@ use rand;
 use rocket::response::content::RawHtml;
 use rocket::response::Redirect;
 use rocket::serde::{json::Json, Deserialize, Serialize};
+
+use rocket::fairing::{Fairing, Info, Kind};
 use rocket::Request;
+use rocket::Rocket;
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use rocket_db_pools::{
     sqlx::{self, Row},
@@ -76,6 +79,7 @@ async fn launch() -> _ {
         .attach(options)
         .attach(DbInterface::init())
         .attach(Template::fairing())
+        .attach(RealTimeMessenger)
         .mount(
             "/api",
             routes![
@@ -95,7 +99,8 @@ async fn launch() -> _ {
                 index,
                 routes::messenger::home,
                 routes::assets::serve_css,
-                routes::assets::file,
+                routes::assets::public_file,
+                routes::assets::user_data
             ],
         )
         .register("/", catchers![not_found, internal_error, not_authorized])
@@ -188,4 +193,40 @@ fn internal_error() -> &'static str {
 #[catch(401)]
 fn not_authorized() -> Redirect {
     Redirect::to("/login")
+}
+
+pub struct RealTimeMessenger;
+
+#[rocket::async_trait]
+impl Fairing for RealTimeMessenger {
+    fn info(&self) -> Info {
+        Info {
+            name: "Database Polling for messenger",
+            kind: Kind::Ignite,
+        }
+    }
+
+    async fn on_ignite(
+        &self,
+        rocket: Rocket<rocket::Build>,
+    ) -> Result<Rocket<rocket::Build>, Rocket<rocket::Build>> {
+        let pool = rocket.state::<DbInterface>().expect("failed");
+        let mut connection = pool.acquire().await.unwrap().detach();
+
+        tokio::spawn(async move {
+            loop {
+                //println!("ok!");
+                // TODO: add database commands
+                /*let names = sqlx::query!("SELECT user_name FROM User;")
+                    .fetch_all(&mut connection)
+                    .await
+                    .unwrap();
+                */
+
+                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+            }
+        });
+
+        Ok(rocket)
+    }
 }

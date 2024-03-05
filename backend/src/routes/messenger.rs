@@ -1,7 +1,9 @@
 use rocket::{
-    futures::{SinkExt, StreamExt},
+    fairing::{Fairing, Info, Kind},
+    futures::{channel::mpsc, SinkExt, StreamExt},
     http::Status,
     serde::{Deserialize, Serialize},
+    Rocket,
 };
 use rocket_dyn_templates::{context, Template};
 use rocket_ws::{Channel, Stream, WebSocket};
@@ -16,12 +18,31 @@ struct Message {
     content: String,
 }
 
+pub struct RealTimeMessenger;
+
+#[rocket::async_trait]
+impl Fairing for RealTimeMessenger {
+    fn info(&self) -> Info {
+        Info {
+            name: "Database Polling for messenger",
+            kind: Kind::Ignite,
+        }
+    }
+
+    async fn on_ignite(
+        &self,
+        rocket: Rocket<rocket::Build>,
+    ) -> Result<Rocket<rocket::Build>, Rocket<rocket::Build>> {
+        Ok(rocket)
+    }
+}
+
 #[get("/home")]
 pub fn home(g: AuthTokenGuard) -> Template {
     let messages = vec![
         Message {
             profile_picture: String::from("ayyo"),
-            username: String::from("FantasyPvP"),
+            username: String::from("fantasypvp"),
             date: String::from("05/03/24"),
             content: String::from("Panic_Attack444 is a simp. this has been factually confirmed on many occasions and is objectively true"),
         },
