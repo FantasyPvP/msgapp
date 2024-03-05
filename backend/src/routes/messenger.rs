@@ -54,7 +54,7 @@ pub fn home(g: AuthTokenGuard) -> Template {
 }
 
 #[get("/chat")]
-pub fn chat<'r>(g: AuthTokenGuard, ws: WebSocket) -> Channel<'r> {
+pub async fn chat<'r>(g: AuthTokenGuard, ws: WebSocket) -> Channel<'r> {
     ws.channel(move |mut stream| {
         Box::pin(async move {
             while let Some(message) = stream.next().await {
