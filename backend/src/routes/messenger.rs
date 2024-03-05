@@ -20,10 +20,10 @@ struct Message {
 pub fn home(g: AuthTokenGuard) -> Template {
     let messages = vec![
         Message {
-            profile_picture: String::from("idk"),
-            username: String::from("idk"),
-            date: String::from("idk"),
-            content: String::from("idk"),
+            profile_picture: String::from("ayyo"),
+            username: String::from("FantasyPvP"),
+            date: String::from("05/03/24"),
+            content: String::from("Panic_Attack444 is a simp. this has been factually confirmed on many occasions and is objectively true"),
         },
         Message {
             profile_picture: String::from("idk"),

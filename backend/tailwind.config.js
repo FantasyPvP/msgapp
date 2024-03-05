@@ -5,7 +5,12 @@ module.exports = {
     "./templates/**/*.{html,html.tera}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        mono: ['SpaceMono', 'monospace'],
+        oswald: ["Oswald", "sans-serif"],
+      },
+    },
   },
   plugins: [],
 }

@@ -83,7 +83,7 @@ async fn launch() -> _ {
                 test,
                 auth::api_login,
                 auth::api_login_nonbrowser,
-                routes::accounts::signup,
+                auth::signup,
                 routes::messenger::chat,
             ],
         )
@@ -91,9 +91,11 @@ async fn launch() -> _ {
             "/",
             routes![
                 auth::user_login_page,
+                auth::user_signup_page,
                 index,
                 routes::messenger::home,
-                routes::assets::serve_css
+                routes::assets::serve_css,
+                routes::assets::file,
             ],
         )
         .register("/", catchers![not_found, internal_error, not_authorized])

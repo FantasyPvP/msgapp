@@ -1,6 +1,6 @@
 <div class="user-message bg-black bg-opacity-20 rounded-md flex flex-row items-stretch gap-5">
 
-  <div class="flex rounded-md grow aspect-square bg-indigo-500 ring-4 ring-slate-600 p-0 m-0">
+  <div class="flex rounded-md size-12 aspect-square bg-indigo-500 p-0 m-0">
     <div class="flex grow">e</div>
     <!-- <img src="{{ message.profile_picture }}" class="profile-picture"> -->
   </div>
@@ -8,7 +8,7 @@
   <div class="message-content flex flex-col">
      <div class="username-date flex flex-row gap-5 items-center">
        <div class="username text-lg">{{ message.username }}</div>
-       <div class="date text-sm">{{ message.date }}</div>
+       <div class="date text-xs">{{ message.date }}</div>
      </div>
      <div class="message text-base">{{ message.content }}</div>
   </div>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Login</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<link href="/assets/style.css" rel="stylesheet">
+    <script>
+        function submitSignupForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Extract the username and password from the form
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+			const confirmpassword = document.getElementById('confirmpassword').value;
+			const token = document.getElementById('token').value;
+
+            // Create a JSON object with the extracted data
+
+			if (password != confirmpassword) {
+				document.getElementById('status').innerHTML = '<div class="bg-opacity-20 shadow-lg shadow-black/50 backdrop-blur-sm bg-red-600 p-4 rounded-md">Passwords Do Not Match</div>';
+				return;
+			};
+			
+            const formData = {
+                username: username,
+                password: password,
+				displayname: confirmpassword,
+				token: token,
+            };
+
+            // Send the form data to the server as JSON
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url; 
+		        } else {
+                    console.log('Login successful'); // Handle signup success
+					document.getElementById('status').innerHTML = '<div class="bg-opacity-20 shadow-lg shadow-black/50 backdrop-blur-sm bg-emerald-600 p-4 rounded-md">Successfully Created Account</div>';
+	            }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Handle any errors
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="fixed flex inset-0 justify-center bg-black z-[-1]">
+        <div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div>
+	</div>
+
+    <div class="absolute text-white left-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4">
+        <div class="font-mono bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black flex flex-col gap-5 p-10 rounded-2xl m-auto">
+            <form class="flex text-base flex-col p-10 gap-5 text-center" id="loginForm" onsubmit="submitSignupForm(event)">
+                <div class="text-2xl px-10">Create Account</div>
+                <div class="h-3"></div>
+                <input class="text-center hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="text" id="username" name="username" placeholder="Enter Username">
+                <input class="text-center hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="password" id="password" name="password" placeholder="Enter Password"> 
+				<input class="text-center hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="password" id="confirmpassword" name="confirmpassword" placeholder="Confirm Password">  
+                <div class="h-3"></div>
+                <div class="text-md">Enter Access Token</div>
+				<input class="text-center hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="text" id="token" name="token" placeholder="Access Token">
+                <button class="text-center hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="submit">Create Account</button>
+            	<div id="status"></div>
+			</form>        
+        </div>    
+    </div>
+</body>
+</html>

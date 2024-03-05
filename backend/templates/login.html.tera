@@ -42,19 +42,20 @@
 </head>
 <body>
     <div class="fixed flex inset-0 justify-center bg-black z-[-1]">
-		<div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div>
+        <div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div>
 	</div>
 
-    <div class="text-white" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-        <div class="bg-opacity-20 bg-black flex flex-col gap-5 p-10 rounded-2xl m-auto">
-            <form class="flex flex-col p-10 gap-5 text-center" id="loginForm" onsubmit="submitLoginForm(event)">
-                <div class="text-xl">Login</div>
+    <div class="absolute text-white left-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4">
+        <div class="font-mono bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black flex flex-col gap-5 p-10 rounded-2xl m-auto">
+            <form class="flex text-base flex-col p-10 gap-5 text-center" id="loginForm" onsubmit="submitLoginForm(event)">
+                <div class="text-2xl px-40">Login</div>
                 <div class="h-3"></div>
-                <input class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="text" id="username" name="username" placeholder="Username">
-                <input class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="password" id="password" name="password" placeholder="Password">  
-                <button class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="submit">Submit</button>
-                <a href="#" class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md">Forgot Password</a>
-                <a href="/" class="text-base bg-opacity-20 bg-black p-4 hover:ring-4 ring-slate-400 rounded-md">Home</a>
+                <input class="text-center hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="text" id="username" name="username" placeholder="Username">
+                <input class="text-center hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="password" id="password" name="password" placeholder="Password">  
+                <button class="hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="submit">Submit</button>
+                <a href="#" class="hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md">Forgot Password</a>
+                <div class="text-md">Not made an account?</div>
+                <a href="/signup" class="hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md">Create Account</a>
             </form>        
         </div>    
     </div>

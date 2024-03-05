@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "SpaceMono";
+  src: url("../public/fonts/SpaceMonoNerdFontMono-Regular.ttf");
+}
+
+@font-face {
+  font-family: "Oswald";
+  src: url("../public/fonts/Oswald-VariableFont_wght.ttf");
+}
