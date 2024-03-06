@@ -22,3 +22,8 @@ pub async fn user_data(file: PathBuf) -> Option<NamedFile> {
         .await
         .ok()
 }
+
+#[get("/favicon.ico")]
+pub async fn favicon() -> Option<NamedFile> {
+    NamedFile::open(Path::new("public/favicon.ico")).await.ok()
+}

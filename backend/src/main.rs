@@ -1,5 +1,6 @@
 use dotenv::dotenv;
 use rand;
+use rocket::futures::channel::mpsc::Sender;
 use rocket::response::content::RawHtml;
 use rocket::response::Redirect;
 use rocket::serde::{json::Json, Deserialize, Serialize};
@@ -13,7 +14,9 @@ use rocket_db_pools::{
     Connection, Database,
 };
 use rocket_dyn_templates::{context, Template};
+use std::collections::HashMap;
 use std::env;
+use std::sync::Mutex;
 use std::{
     str,
     sync::Arc,
@@ -80,6 +83,9 @@ async fn launch() -> _ {
         .attach(DbInterface::init())
         .attach(Template::fairing())
         .attach(RealTimeMessenger)
+        .manage(routes::messenger::WebSocketConnections {
+            connections: Arc::new(Mutex::new(Vec::<(i64, Sender<String>)>::new())),
+        })
         .mount(
             "/api",
             routes![
@@ -100,7 +106,8 @@ async fn launch() -> _ {
                 routes::messenger::home,
                 routes::assets::serve_css,
                 routes::assets::public_file,
-                routes::assets::user_data
+                routes::assets::user_data,
+                routes::assets::favicon,
             ],
         )
         .register("/", catchers![not_found, internal_error, not_authorized])
@@ -215,14 +222,18 @@ impl Fairing for RealTimeMessenger {
 
         tokio::spawn(async move {
             loop {
-                //println!("ok!");
-                // TODO: add database commands
-                /*let names = sqlx::query!("SELECT user_name FROM User;")
-                    .fetch_all(&mut connection)
-                    .await
-                    .unwrap();
-                */
-
+                // TODO: add channels
+                let messages = sqlx::query!(
+                    "
+                    SELECT m.content, m.datetime, u.display_name 
+                    FROM User AS u 
+                    JOIN Message AS m ON m.user_id = u.user_id
+                    ORDER BY m.datetime DESC
+                    LIMIT 100;"
+                )
+                .fetch_all(&mut connection)
+                .await
+                .unwrap();
                 tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
             }
         });
