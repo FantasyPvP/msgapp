@@ -275,7 +275,7 @@ fn validate_password(password: &str) -> Result<(), String> {
 }
 
 #[derive(Debug)]
-pub struct AuthTokenGuard(i64); // the contained data is the user_id
+pub struct AuthTokenGuard(pub i64); // the contained data is the user_id
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Claims {
@@ -298,6 +298,7 @@ impl<'r> FromRequest<'r> for AuthTokenGuard {
                 "SELECT token_id, token, created_at, expires_at, user_id FROM SessionToken WHERE token = ?",
                 value
             ).fetch_optional(&***pool).await.expect("SQL QUERY FAILED") {
+                println!("authenticated user_id: {}", token.user_id);
                 return Outcome::Success(AuthTokenGuard(token.user_id))
             }
         }

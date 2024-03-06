@@ -1,23 +1,29 @@
 use dotenv::dotenv;
 use rand;
-use rocket::futures::channel::mpsc::Sender;
-use rocket::response::content::RawHtml;
-use rocket::response::Redirect;
-use rocket::serde::{json::Json, Deserialize, Serialize};
 
-use rocket::fairing::{Fairing, Info, Kind};
-use rocket::Request;
-use rocket::Rocket;
+use rocket::{
+    futures::{
+        channel::mpsc::Sender,
+        SinkExt,
+    },
+    tokio::sync::Mutex,
+    response::{content::RawHtml, Redirect},
+    serde::{json::Json, Deserialize, Serialize},
+    fairing::{Fairing, Info, Kind},
+    Request,
+    Rocket,
+};
+
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use rocket_db_pools::{
     sqlx::{self, Row},
     Connection, Database,
 };
 use rocket_dyn_templates::{context, Template};
-use std::collections::HashMap;
-use std::env;
-use std::sync::Mutex;
+
 use std::{
+    collections::HashMap,
+    env,
     str,
     sync::Arc,
     time::{SystemTime, UNIX_EPOCH},
@@ -82,10 +88,10 @@ async fn launch() -> _ {
         .attach(options)
         .attach(DbInterface::init())
         .attach(Template::fairing())
-        .attach(RealTimeMessenger)
         .manage(routes::messenger::WebSocketConnections {
-            connections: Arc::new(Mutex::new(Vec::<(i64, Sender<String>)>::new())),
+            connections: Arc::new(Mutex::new(Vec::<(i64, Sender<routes::messenger::UserMessage>)>::new())),
         })
+        .attach(RealTimeMessenger)
         .mount(
             "/api",
             routes![
@@ -218,26 +224,49 @@ impl Fairing for RealTimeMessenger {
         rocket: Rocket<rocket::Build>,
     ) -> Result<Rocket<rocket::Build>, Rocket<rocket::Build>> {
         let pool = rocket.state::<DbInterface>().expect("failed");
+        let managed_channels = rocket.state::<routes::messenger::WebSocketConnections>().expect("failed");
         let mut connection = pool.acquire().await.unwrap().detach();
+        let channels: Arc<Mutex<_>> = Arc::clone(&managed_channels.connections);
 
         tokio::spawn(async move {
+
+            let mut time: i64;
+            
             loop {
+                time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as i64;
+                tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+                
                 // TODO: add channels
                 let messages = sqlx::query!(
                     "
-                    SELECT m.content, m.datetime, u.display_name 
+                    SELECT m.content, m.datetime, u.user_name 
                     FROM User AS u 
                     JOIN Message AS m ON m.user_id = u.user_id
+                    WHERE m.datetime > ?
                     ORDER BY m.datetime DESC
-                    LIMIT 100;"
+                    LIMIT 100;", time
                 )
                 .fetch_all(&mut connection)
                 .await
                 .unwrap();
-                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+
+                for m in messages {
+                    println!("new message {}", m.content);
+
+                    let msg = routes::messenger::UserMessage {
+                        username: m.user_name.unwrap(),
+                        date: m.datetime.to_string(),
+                        content: m.content,
+                    };
+                    let mut guard = channels.lock().await;
+                    for c in guard.iter_mut() {
+                        c.1.send(msg.clone()).await.unwrap();
+                    }
+                }
             }
         });
 
         Ok(rocket)
     }
 }
+ 

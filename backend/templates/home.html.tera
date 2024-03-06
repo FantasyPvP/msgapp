@@ -36,11 +36,10 @@
  	   		messageContainer.appendChild(messageElement);
 		};
 		function handleKeyPress(event) {
-			console.log("yes");
       		if (event.key === "Enter") {
     			// Get the input value
        			const inputValue = document.getElementById('inputField').value;
-				console.log(inputValue);
+				console.log("sending to server : " + inputValue);
 				
     			if (socket && socket.readyState === WebSocket.OPEN) {
       				socket.send(JSON.stringify(inputValue));
