@@ -6,8 +6,22 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
   	<link href="/assets/style.css" rel="stylesheet">
 	<script>
-		var socket = new WebSocket('ws://' + window.location.host + '/api/chat');
-        socket.onopen = function(event) {
+		let socket;
+		function connectSocket() {
+			try {
+				socket = new WebSocket('wss://' + window.location.host + '/api/chat');
+			} catch(error) {
+				console.error('WebSocket connection error using wss:', error);
+				createWebSocketFallback();
+			}
+		}
+		function connectSocketFallback() {
+			socket = new WebSocket('ws://your-ws-url');
+		}
+		
+		connectSocket()
+		
+		socket.onopen = function(event) {
             console.log('WebSocket is open now.');
             // You can send messages here if needed
         };
@@ -34,32 +48,47 @@
  	   		const messageElement = document.createElement('div');
 			messageElement.textContent = message.content; // Assuming the message object has a "content" property
  	   		messageContainer.appendChild(messageElement);
-		};
+		}
 		function handleKeyPress(event) {
       		if (event.key === "Enter") {
-    			// Get the input value
-       			const inputValue = document.getElementById('inputField').value;
-				console.log("sending to server : " + inputValue);
+    		    sendMessage()
+       		}
+		}
+        function sendMessage() {
+            const inputValue = document.getElementById('inputField').value;
+			console.log("sending to server : " + inputValue);
 				
-    			if (socket && socket.readyState === WebSocket.OPEN) {
-      				socket.send(JSON.stringify(inputValue));
-    			} else {
-      				console.error("WebSocket connection is not open");	
-				}
-			};
-		};
+    		if (socket && socket.readyState === WebSocket.OPEN) {
+      			socket.send(JSON.stringify(inputValue));
+			} else {
+                console.error("WebSocket connection is not open");	
+			}
+        }
 	</script>
 </head>
 <body>
     <div class="fixed flex inset-0 justify-center bg-black z-[-1] class="bg-cover bg-center" style="background-image: url(public/background.jpg)">
         <!-- <div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div> -->
 	</div>
-        <div class="m-10 text-white font-mono bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black flex flex-col gap-5 p-10 rounded-2xl m-auto">
-			{% for message in messages %}
-				{% include "message" %}
-			{% endfor %}
-			<input class="hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="text" id="inputField" onkeydown="handleKeyPress(event)" placeholder="Enter a message"/>
+
+	<div class="m-10 text-white text-xs sm:text-base font-mono bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black flex flex-col gap-5 p-5 sm:p-10 rounded-2xl m-auto">
+		{% for message in messages %}
+			{% include "message" %}
+		{% endfor %}
+		<div class="flex flex-row gap-2">
+			<input class="grow hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="text" id="inputField" onkeydown="handleKeyPress(event)" placeholder="Enter a message"/>
+			<button class="hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="submit" onclick="sendMessage()">⏎</button>
 		</div>
 	</div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
