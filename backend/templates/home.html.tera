@@ -6,8 +6,22 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
   	<link href="/assets/style.css" rel="stylesheet">
 	<script>
-		var socket = new WebSocket('ws://' + window.location.host + '/api/chat');
-        socket.onopen = function(event) {
+		let socket;
+		function connectSocket() {
+			try {
+				socket = new WebSocket('wss://' + window.location.host + '/api/chat');
+			} catch(error) {
+				console.error('WebSocket connection error using wss:', error);
+				createWebSocketFallback();
+			}
+		}
+		function connectSocketFallback() {
+			socket = new WebSocket('ws://your-ws-url');
+		}
+		
+		connectSocket()
+		
+		socket.onopen = function(event) {
             console.log('WebSocket is open now.');
             // You can send messages here if needed
         };
