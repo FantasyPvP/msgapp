@@ -5,13 +5,7 @@ use std::{
 };
 use chrono::{DateTime, Utc};
 
-use rocket::{
-    futures::{channel::mpsc, SinkExt, StreamExt},
-    http::Status,
-    serde::{Deserialize, Serialize},
-    Rocket, State,
-    tokio::sync::Mutex,
-};
+use rocket::{futures::{channel::mpsc, SinkExt, StreamExt}, http::Status, serde::{Deserialize, Serialize}, Rocket, State, tokio::sync::Mutex, Shutdown};
 
 use rocket_db_pools::{
     sqlx::{self, Row},
@@ -21,6 +15,7 @@ use rocket_db_pools::{
 use rocket_dyn_templates::{context, Template};
 use rocket_ws::{Channel, Stream, WebSocket};
 use sha2::digest::const_oid::Arcs;
+use tracing::{event, Level};
 
 use crate::auth::AuthTokenGuard;
 use crate::DbInterface;
@@ -63,22 +58,26 @@ pub async fn chat<'r>(
     ws: WebSocket,
     mut db: Connection<DbInterface>,
     conns: &'r State<WebSocketConnections>,
+    mut shutdown: Shutdown,
 ) -> Channel<'r> {
     let (sender, mut receiver) = mpsc::channel::<UserMessage>(100);
     let AuthTokenGuard(user_id) = g;
-    println!("USER_ID: {} CONNECTED", user_id);
     
     conns.connections.lock().await.push((user_id, sender));
 
-    ws.channel(move |stream| {
+    ws.channel(move |mut stream| {
         let (mut ws_sender, mut ws_receiver) = stream.split();
 
         let ws_task = async move {
             while let Some(packet) = ws_receiver.next().await {
+                let message = if let Ok(message) = packet {
+                    message.into_text().unwrap()
+                } else {
+                    event!(Level::WARN, "Websocket failed to recieve message, dropping connection");
+                    break;
+                };
+
                 let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as i64;
-                let message = packet.expect("error recieving packet").into_text().unwrap();
-                println!("RECEIVED MESSAGE FROM FRONTEND: {}", &message);
-                println!("userid {}", user_id);
 
                 if message.len() == 0 {
                     continue;
@@ -91,16 +90,14 @@ pub async fn chat<'r>(
             }
 
             conns.connections.lock().await.retain(|(id, _)| *id != user_id);
-            println!("USER {} DISCONNECTED", user_id);
         };
 
     
         let channel_task = async move {
             while let Some(msg) = receiver.next().await {
-                println!("FOUND NEW MESSAGE IN DATABASE: {}", msg.content);
                 match ws_sender.send(serde_json::to_string(&msg).unwrap().into()).await {
                     Ok(_) => {},
-                    Err(_) => println!( "failed to send message" ),
+                    Err(_) => event!(Level::WARN, "failed to send message" ),
                 }
             }
         };
@@ -108,7 +105,12 @@ pub async fn chat<'r>(
             let _ = tokio::select! {
                 _ = ws_task => {},
                 _ = channel_task => {},
+                _ = &mut shutdown => {
+                    event!(Level::INFO, "Shutdown signal recieved, dropping socket.");
+                    return Ok(());
+                },
             };
+            tokio::signal::ctrl_c().await.unwrap();
             Ok(())
         })
     })

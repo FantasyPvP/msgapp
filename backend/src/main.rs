@@ -1,18 +1,10 @@
 use dotenv::dotenv;
 use rand;
 
-use rocket::{
-    futures::{
-        channel::mpsc::Sender,
-        SinkExt,
-    },
-    tokio::sync::Mutex,
-    response::{content::RawHtml, Redirect},
-    serde::{json::Json, Deserialize, Serialize},
-    fairing::{Fairing, Info, Kind},
-    Request,
-    Rocket,
-};
+use rocket::{futures::{
+    channel::mpsc::Sender,
+    SinkExt,
+}, tokio::sync::Mutex, response::{content::RawHtml, Redirect}, serde::{json::Json, Deserialize, Serialize}, fairing::{Fairing, Info, Kind}, Request, Rocket, Orbit};
 
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use rocket_db_pools::{
@@ -44,6 +36,7 @@ use rsa::{Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey};
 mod auth;
 mod routes;
 use auth::AuthTokenGuard;
+use crate::routes::messenger::UserMessage;
 
 #[macro_use]
 extern crate rocket;
@@ -89,7 +82,7 @@ async fn launch() -> _ {
         .attach(DbInterface::init())
         .attach(Template::fairing())
         .manage(routes::messenger::WebSocketConnections {
-            connections: Arc::new(Mutex::new(Vec::<(i64, Sender<routes::messenger::UserMessage>)>::new())),
+            connections: Arc::new(Mutex::new(Vec::<(i64, Sender<UserMessage>)>::new())),
         })
         .attach(RealTimeMessenger)
         .mount(
@@ -179,7 +172,6 @@ fn password_hashing_test() {
 
 #[get("/test")]
 fn test(g: AuthTokenGuard) -> &'static str {
-    println!("{:?}", g);
     "test"
 }
 
@@ -229,7 +221,6 @@ impl Fairing for RealTimeMessenger {
         let channels: Arc<Mutex<_>> = Arc::clone(&managed_channels.connections);
 
         tokio::spawn(async move {
-
             let mut time: i64;
             
             loop {
@@ -251,8 +242,6 @@ impl Fairing for RealTimeMessenger {
                 .unwrap();
 
                 for m in messages {
-                    println!("new message {}", m.content);
-
                     let msg = routes::messenger::UserMessage {
                         user_name: m.user_name.unwrap(),
                         datetime: m.datetime.to_string(),
@@ -265,8 +254,25 @@ impl Fairing for RealTimeMessenger {
                 }
             }
         });
-
         Ok(rocket)
     }
 }
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
