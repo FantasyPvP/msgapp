@@ -85,7 +85,7 @@ async fn launch() -> _ {
     let figment = rocket::Config::figment().merge(("secret_key", secret_key));
 
     rocket::custom(figment)
-        .attach(options)
+        // .attach(options)
         .attach(DbInterface::init())
         .attach(Template::fairing())
         .manage(routes::messenger::WebSocketConnections {
