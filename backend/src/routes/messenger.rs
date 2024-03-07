@@ -3,6 +3,7 @@ use std::{
     sync::Arc,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+use chrono::{DateTime, Utc};
 
 use rocket::{
     futures::{channel::mpsc, SinkExt, StreamExt},
@@ -26,40 +27,33 @@ use crate::DbInterface;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct UserMessage {
-    pub username: String,
-    pub date: String,
+    pub user_name: String,
     pub content: String,
+    pub datetime: String,
 }
 
 #[get("/home")]
-pub fn home(_g: AuthTokenGuard) -> Template {
-    let messages = vec![
-        UserMessage {
-            username: String::from("fantasypvp"),
-            date: String::from("05/03/24"),
-            content: String::from("Panic_Attack444 is a simp. this has been factually confirmed on many occasions and is objectively true"),
+pub async fn home(_g: AuthTokenGuard, mut db: Connection<DbInterface>) -> Template {
+    let messages = sqlx::query!(
+        "SELECT u.user_name, m.content, m.datetime FROM User AS u JOIN Message AS m ON m.user_id = u.user_id ORDER BY m.datetime DESC LIMIT 250;"
+    ).fetch_all(&mut **db).await.expect("unable to fetch messages from database: TODO: remove this unwrap");
+
+    let messages = messages.into_iter().map(|m| UserMessage {
+        user_name: m.user_name.unwrap(),
+        content: m.content,
+        datetime: {
+            let duration = std::time::Duration::from_millis(m.datetime as u64);
+            let system_time = std::time::UNIX_EPOCH + duration;
+            let datetime: DateTime<Utc> = DateTime::from(system_time);
+            datetime.format("%d-%m-%y %H-%M-%S").to_string()
         },
-        UserMessage {
-            username: String::from("idk"),
-            date: String::from("idk"),
-            content: String::from("idk"),
-        },
-        UserMessage {
-            username: String::from("idk"),
-            date: String::from("idk"),
-            content: String::from("idk"),
-        },
-        UserMessage {
-            username: String::from("idk"),
-            date: String::from("idk"),
-            content: String::from("idk"),
-        },
-        UserMessage {
-            username: String::from("idk"),
-            date: String::from("idk"),
-            content: String::from("idk"),
-        },
-    ];
+    }).collect::<Vec<_>>();
+
+    // let messages = (0..50).map(|_| UserMessage {
+    //     user_name: String::from("zxq5"),
+    //     date_time: String::from("05/03/24"),
+    //     content: String::from("Panic_Attack444 is a simp. this has been factually confirmed on many occasions and is objectively true"),
+    // }).collect::<Vec<_>>();
     Template::render("home", context! { messages })
 }
 
@@ -85,6 +79,10 @@ pub async fn chat<'r>(
                 let message = packet.expect("error recieving packet").into_text().unwrap();
                 println!("RECEIVED MESSAGE FROM FRONTEND: {}", &message);
                 println!("userid {}", user_id);
+
+                if message.len() == 0 {
+                    continue;
+                }
 
                 sqlx::query!("INSERT INTO Message (user_id, content, datetime)
                     VALUES (?, ?, ?)",

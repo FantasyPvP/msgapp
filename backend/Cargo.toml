@@ -27,3 +27,4 @@ sha2 = "0.10.8"
 jsonwebtoken = "9.2.0"
 figment = { version = "0.10.14", features = ["env"] }
 rocket_ws = "0.1.0"
+chrono = "0.4.35"

@@ -254,8 +254,8 @@ impl Fairing for RealTimeMessenger {
                     println!("new message {}", m.content);
 
                     let msg = routes::messenger::UserMessage {
-                        username: m.user_name.unwrap(),
-                        date: m.datetime.to_string(),
+                        user_name: m.user_name.unwrap(),
+                        datetime: m.datetime.to_string(),
                         content: m.content,
                     };
                     let mut guard = channels.lock().await;
