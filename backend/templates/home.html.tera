@@ -7,67 +7,80 @@
   	<link href="/assets/style.css" rel="stylesheet">
 	<script>
 		let socket;
-		function connectSocket() {
-			try {
-				socket = new WebSocket('wss://' + window.location.host + '/api/chat');
-			} catch(error) {
-				console.error('WebSocket connection error using wss:', error);
-				createWebSocketFallback();
-			}
+		function setupWebSocket(protocol) {
+			socket = new WebSocket(protocol + '://' + window.location.host + '/api/chat');
+
+			socket.onclose = function (event) {
+				if (event.code === 1015 && protocol === 'wss') {
+					console.log("failed to connect using wss; falling back to ws");
+					setupWebSocket("ws");
+					return;
+				}
+				// ... (other close event handling code remains unchanged)
+			};
+
+			socket.onopen = function (event) {
+				console.log('Opened Websocket');
+				// You can send messages here if needed
+			};
+
+			socket.onmessage = function (event) {
+				console.log('Message received: ' + event.data);
+				// Handle incoming messages here
+			};
+
+			socket.onerror = function (error) {
+				console.error('WebSocket error: ' + error.message);
+				// Handle any errors here
+			};
 		}
-		function connectSocketFallback() {
-			socket = new WebSocket('ws://your-ws-url');
-		}
-		
-		connectSocket()
-		
-		socket.onopen = function(event) {
-            console.log('WebSocket is open now.');
-            // You can send messages here if needed
-        };
-        socket.onmessage = function(event) {
-            console.log('Message received: ' + event.data);
-            // Handle incoming messages here
-        };
-        socket.onclose = function(event) {
-            if (event.wasClean) {
-                console.log('WebSocket closed cleanly');
-            } else {
-                console.error('WebSocket connection closed unexpectedly');
-            }
-            console.log('Code: ' + event.code + ' Reason: ' + event.reason);
-        };
-        socket.onerror = function(error) {
-            console.error('WebSocket error: ' + error.message);
-            // Handle any errors here
-        };
-	
-		function insertMessage(message) {
- 			// Assuming there's a <div> with id "messageContainer" to hold the messages
-	   		const messageContainer = document.getElementById('messageContainer');
- 	   		const messageElement = document.createElement('div');
-			messageElement.textContent = message.content; // Assuming the message object has a "content" property
- 	   		messageContainer.appendChild(messageElement);
-		}
-		function handleKeyPress(event) {
-      		if (event.key === "Enter") {
-    		    sendMessage()
-       		}
-		}
-        function sendMessage() {
-            const inputValue = document.getElementById('inputField').value;
+
+		function sendMessage(inputValue) {
 			console.log("sending to server : " + inputValue);
-				
-    		if (socket && socket.readyState === WebSocket.OPEN) {
-      			socket.send(JSON.stringify(inputValue));
+
+			if (socket && socket.readyState === WebSocket.OPEN) {
+				socket.send(JSON.stringify(inputValue));
 			} else {
-                console.error("WebSocket connection is not open");	
+				console.error("WebSocket connection is not open");
 			}
-        }
+		}
+
+		function initialize(sendButton, inputField) {
+			// Remove existing event listeners to prevent duplicates
+			sendButton.removeEventListener('click', sendButtonClickHandler);
+			inputField.removeEventListener('keypress', inputFieldKeyPressHandler);
+
+			// Add event listeners
+			sendButton.addEventListener('click', sendButtonClickHandler);
+			inputField.addEventListener('keypress', inputFieldKeyPressHandler);
+
+			function sendButtonClickHandler() {
+				console.log("send button pressed");
+				sendMessage(inputField.value);
+			}
+
+			function inputFieldKeyPressHandler(event) {
+				if (event.key === "Enter") {
+					console.log("enter key pressed");
+					sendMessage(inputField.value);
+				}
+			}
+		}
+		function openSocket() {
+			setupWebSocket('wss');
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			const inputField = document.getElementById('inputField');
+			const sendButton = document.getElementById('enterButton');
+
+			openSocket();
+			initialize(sendButton, inputField);
+		});
 	</script>
 </head>
 <body>
-    <div class="fixed flex inset-0 justify-center bg-black z-[-1] class="bg-cover bg-center" style="background-image: url(public/background.jpg)">
+    <div class="fixed flex inset-0 justify-center bg-black z-[-1] bg-cover bg-center" style="background-image: url(public/background.jpg)">
         <!-- <div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div> -->
 	</div>
 
@@ -76,8 +89,8 @@
 			{% include "message" %}
 		{% endfor %}
 		<div class="flex flex-row gap-2">
-			<input class="grow hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="text" id="inputField" onkeydown="handleKeyPress(event)" placeholder="Enter a message"/>
-			<button class="hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="submit" onclick="sendMessage()">⏎</button>
+			<input class="grow hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="text" id="inputField"  placeholder="Enter a message"/>
+			<button class="hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" type="submit" id="enterButton">⏎</button>
 		</div>
 	</div>
 </body>

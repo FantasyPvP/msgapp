@@ -100,7 +100,10 @@ pub async fn chat<'r>(
         let channel_task = async move {
             while let Some(msg) = receiver.next().await {
                 println!("FOUND NEW MESSAGE IN DATABASE: {}", msg.content);
-                let _ = ws_sender.send(serde_json::to_string(&msg).unwrap().into()).await;
+                match ws_sender.send(serde_json::to_string(&msg).unwrap().into()).await {
+                    Ok(_) => {},
+                    Err(_) => println!( "failed to send message" ),
+                }
             }
         };
         Box::pin(async move {
