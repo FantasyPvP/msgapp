@@ -84,7 +84,7 @@
         <!-- <div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div> -->
 	</div>
 
-	<div class="m-10 text-white text-xs sm:text-base font-mono bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black flex flex-col gap-5 p-5 sm:p-10 rounded-2xl m-auto">
+	<div class="m-2 sm:m-10 text-white text-xs sm:text-base font-mono bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black flex flex-col gap-5 p-3 sm:p-10 rounded-2xl m-auto">
 		{% for message in messages %}
 			{% include "message" %}
 		{% endfor %}
