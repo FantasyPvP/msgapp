@@ -47,7 +47,7 @@ pub async fn home(_g: AuthTokenGuard, mut db: Connection<DbInterface>) -> Templa
             let datetime: DateTime<Utc> = DateTime::from(system_time);
             datetime.format("%d-%m-%y %H-%M-%S").to_string()
         },
-    }).collect::<Vec<_>>();
+    }).rev().collect::<Vec<_>>();
 
     // let messages = (0..50).map(|_| UserMessage {
     //     user_name: String::from("zxq5"),
