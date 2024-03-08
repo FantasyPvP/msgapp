@@ -172,6 +172,7 @@ pub async fn signup(
         }
         _ => (),
     };
+    println!("access token ok");
 
     if let Err(e) = validate_username(&req.username) {
         return Json(SignupResponse {
@@ -266,8 +267,8 @@ fn validate_password(password: &str) -> Result<(), String> {
     if !password.is_ascii() {
         return Err(String::from("Password must contain only ASCII characters"));
     }
-    if password.len() > 30 || password.len() < 8 {
-        return Err(String::from("Password must be between 8 and 30 characters"));
+    if password.len() > 30 || password.len() < 3 {
+        return Err(String::from("Password must be between 3 and 30 characters"));
     }
     // TODO: add additional validation checks
 
@@ -329,7 +330,7 @@ impl SessionToken {
 
         SessionToken {
             token_id: None,
-            token: String::new(),
+            token: hashed,
             created_at: current_time.as_secs() as i64,
             expires_at: Some((current_time + expiry).as_secs() as i64),
             user_id,
