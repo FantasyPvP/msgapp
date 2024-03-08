@@ -3,3 +3,4 @@
 */Rocket.toml
 */secrets/*
 */.env
+*/*.db/
