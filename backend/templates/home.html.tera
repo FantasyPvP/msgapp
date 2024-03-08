@@ -110,6 +110,8 @@
 
 			// Insert the new child element into the parent container
 			msg_container.insertAdjacentHTML('beforeend', html);
+
+  			msg_container.scroll({ top: msg_container.scrollHeight, behavior: 'smooth' });
 		}
 
 		function openSocket() {

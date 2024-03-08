@@ -6,6 +6,6 @@
             <div class="username text-lg">{{ message.user_name }}</div>
             <div class="date text-xs">{{ message.datetime }}</div>
         </div>
-        <div class="message text-xs pb-2">{{ message.content }}</div>
+        <div class="message text-xs pb-2 break-words">{{ message.content }}</div>
     </div>
 </div>
