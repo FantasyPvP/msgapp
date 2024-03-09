@@ -11,7 +11,7 @@
             <!-- <div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div> -->
         </div>
         <div class="flex items-center justify-center h-screen sm:p-10">
-            <div id="first" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 max-h-full h-full overflow-y-auto flex-1 w-full bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black text-white text-xs sm:text-base font-mono gap-5 p-10 sm:rounded-2xl m-auto">
+            <div id="first" class="grid grid-cols-1 min-[800px]:grid-cols-2 min-[1200px]:grid-cols-3 min-[1600px]:grid-cols-4 min-[2000px]:grid-cols-5 min-[2400px]:grid-cols-6 max-h-full h-full overflow-y-auto flex-1 w-full bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black text-white text-xs sm:text-base font-mono gap-5 p-10 sm:rounded-2xl m-auto">
                 {% for pack in packs %}
                 {% include "packs/pack" %}
                 {% endfor %}
