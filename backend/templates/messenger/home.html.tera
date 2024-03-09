@@ -14,7 +14,7 @@
 		<div id="first" class="flex flex-col max-h-full w-full bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black text-white text-xs sm:text-base font-mono gap-2 sm:gap-5 p-3 sm:p-10 sm:rounded-2xl m-auto">
 			<div id="messageScrollBox" class="overflow-y-auto flex-1 flex flex-col gap-2 sm:gap-5">
 				{% for message in messages %}
-                    {% include "message" %}
+                    {% include "messenger/message" %}
                 {% endfor %}
 			</div>
 			<div class="flex flex-row gap-2 mt-2 sm:mt-5">

@@ -35,19 +35,10 @@ use jsonwebtoken::{
 
 use crate::DbInterface;
 
-/*
-AUTH TOKEN GUARD - uses a cookie to check users are authenticated before proceeding to a given endpoint
-*/
-
-// this request guard is used to ensure that a user is authenticated when making any requests
-
-/*
-LOGIN LOGIC
-*/
 
 #[get("/login")]
 pub fn user_login_page() -> Template {
-    Template::render("login", context! { title: "test"})
+    Template::render("auth/login", context! { title: "test"})
 }
 
 #[derive(Serialize)]
@@ -63,7 +54,7 @@ pub async fn api_login<'a>(
     jar: &CookieJar<'_>,
 ) -> Option<Redirect> {
     if login_logic(jar, form, db).await {
-        Some(Redirect::to("/"))
+        Some(Redirect::to("/home"))
     } else {
         None
     }
@@ -221,7 +212,7 @@ pub async fn signup(
 
 #[get("/signup")]
 pub fn user_signup_page() -> Template {
-    Template::render("signup", context! {})
+    Template::render("auth/signup", context! {})
 }
 
 #[derive(Serialize, Deserialize)]

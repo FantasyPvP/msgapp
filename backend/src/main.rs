@@ -85,30 +85,28 @@ async fn launch() -> _ {
             connections: Arc::new(Mutex::new(Vec::<(i64, Sender<UserMessage>)>::new())),
         })
         .attach(RealTimeMessenger)
-        .mount(
-            "/api",
-            routes![
-                gethtml,
-                test,
-                auth::api_login,
-                auth::api_login_nonbrowser,
-                auth::signup,
-                routes::messenger::chat,
-            ],
-        )
-        .mount(
-            "/",
-            routes![
-                auth::user_login_page,
-                auth::user_signup_page,
-                index,
-                routes::messenger::home,
-                routes::assets::serve_css,
-                routes::assets::public_file,
-                routes::assets::user_data,
-                routes::assets::favicon,
-            ],
-        )
+        .mount("/api", routes![
+            gethtml,
+            test,
+            auth::api_login,
+            auth::api_login_nonbrowser,
+            auth::signup,
+            routes::messenger::chat,
+        ])
+        .mount("/", routes![
+            auth::user_login_page,
+            auth::user_signup_page,
+            index,
+            routes::messenger::home,
+            routes::assets::serve_css,
+            routes::assets::public_file,
+            routes::assets::user_data,
+            routes::assets::favicon,
+        ])
+        .mount("/packs", routes![
+            routes::packs::endpoint_packs,
+            routes::packs::endpoint_pack_assets,
+        ])
         .register("/", catchers![not_found, internal_error, not_authorized])
 }
 
@@ -187,7 +185,7 @@ fn index() -> RawHtml<&'static str> {
 
 #[catch(404)]
 fn not_found(req: &Request) -> Template {
-    Template::render("404", context! {})
+    Template::render("other/404", context! {})
 }
 
 #[catch(500)]

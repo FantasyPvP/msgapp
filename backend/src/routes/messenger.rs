@@ -49,7 +49,7 @@ pub async fn home(_g: AuthTokenGuard, mut db: Connection<DbInterface>) -> Templa
     //     date_time: String::from("05/03/24"),
     //     content: String::from("Panic_Attack444 is a simp. this has been factually confirmed on many occasions and is objectively true"),
     // }).collect::<Vec<_>>();
-    Template::render("home", context! { messages })
+    Template::render("messenger/home", context! { messages })
 }
 
 #[get("/chat")]
