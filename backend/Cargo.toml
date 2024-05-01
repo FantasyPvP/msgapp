@@ -6,17 +6,17 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-trait = "0.1.74"
-reqwest = "0.11.22"
+async-trait = "0.1.77"
+reqwest = "0.11.25"
 rocket = { version = "0.5.0", features = ["json", "tls", "secrets"] }
 rocket_cors = "0.6.0"
 rocket_db_pools = { version = "0.1.0", features = ["sqlx_macros", "sqlx_sqlite"] }
-serde = { version = "1.0.193", features = ["derive"] }
-serde_json = "1.0.108"
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.114"
 sqlx = "0.7.3"
 dotenv = "0.15.0"
-tokio-tungstenite = "0.20.1"
-tokio = { version = "1.35.0", features = ["macros", "rt-multi-thread"] }
+tokio-tungstenite = "0.21.0"
+tokio = { version = "1.36.0", features = ["macros", "rt-multi-thread"] }
 argon2 = "0.5.2"
 rsa = { version = "0.9.6", features = ["pkcs5"] }
 aes-gcm = "0.10.3"
@@ -28,3 +28,4 @@ jsonwebtoken = "9.2.0"
 figment = { version = "0.10.14", features = ["env"] }
 rocket_ws = "0.1.0"
 chrono = "0.4.35"
+toml = "0.8.11"

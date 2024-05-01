@@ -1,0 +1,44 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+    <title>Computer Science Revision Site</title>
+    <meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<link href="/assets/style.css" rel="stylesheet">
+  </head>
+  <script>
+    async function checkAnswer(question_id, response_id) {
+      const response = await fetch("http://localhost:8000/check/" + question_id + "/" + (response_id-1) ); // sub 1 since loops in tera are 1-indexed
+        
+      var selected = document.getElementById(response_id);
+      if (await response.json()) {        
+        selected.style.backgroundColor = 'green';
+        var title = document.getElementById('question');
+        title.innerHTML = title.innerHTML + "   ✅"
+      } else {
+        selected.style.backgroundColor = 'red';
+      }
+    }
+
+
+  </script>
+  <body>
+    <div class="fixed flex inset-0 justify-center bg-black z-[-1] class="bg-cover bg-center" style="background-image: url(public/background.jpg)">
+      <div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div>
+	</div>
+    
+    <div class="absolute text-white left-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4">
+      <div class="font-mono bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black flex flex-col gap-5 p-5 sm:p-10 rounded-2xl m-auto">
+        <form class="flex text-sm sm:text-base flex-col p-5 sm:p-10 gap-5 text-center">
+          <div class="text-3xl">{{ question.name }}</div>
+          <div class="h-3 px-28 sm:px-48"></div>          
+          {% for option in question.options %}     
+            <input id="{{ loop.index }}" type="button" class="hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" value="{{ option }}" onClick="checkAnswer({{ question.id }}, {{ loop.index }})"/>
+          {% endfor %}  
+      
+          <input type="button" class="hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md" value="Next Question" onClick="window.location.reload();"/>      
+        </div>
+      </div>    
+    </div>
+  </body>
+</html> 

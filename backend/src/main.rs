@@ -31,6 +31,7 @@ use argon2::{
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
+use rocket::fs::TempFile;
 use rsa::{Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey};
 
 mod auth;
@@ -102,10 +103,13 @@ async fn launch() -> _ {
             routes::assets::public_file,
             routes::assets::user_data,
             routes::assets::favicon,
+            routes::revision_presentation::index,
+            routes::revision_presentation::check_ans,
         ])
         .mount("/packs", routes![
             routes::packs::endpoint_packs,
             routes::packs::endpoint_pack_assets,
+            routes::packs::endpoint_pack_builder,
         ])
         .register("/", catchers![not_found, internal_error, not_authorized])
 }
@@ -189,8 +193,8 @@ fn not_found(req: &Request) -> Template {
 }
 
 #[catch(500)]
-fn internal_error() -> &'static str {
-    "Internal server error | Something went very wrong"
+fn internal_error() -> Template {
+    Template::render("other/500", context! {})
 }
 
 #[catch(401)]

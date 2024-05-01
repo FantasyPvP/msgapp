@@ -1,0 +1,3 @@
+title = "Diamond Sets"
+description = "Select the diamond set for your pack."
+allow_none = true

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Pack Builder</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="/assets/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="fixed flex inset-0 justify-center bg-black z-[-1] bg-cover bg-center" style="background-image: url(/public/background.jpg)">
+             <!-- <div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div> -->
+        </div>
+        <div class="flex items-center justify-center h-screen sm:p-10">
+            <div id="first" class="grid grid-cols-1 min-[800px]:grid-cols-2 min-[1200px]:grid-cols-3 min-[1600px]:grid-cols-4 min-[2000px]:grid-cols-5 min-[2400px]:grid-cols-6 max-h-full h-full overflow-y-auto flex-1 w-full bg-opacity-20 shadow-2xl shadow-black/50 backdrop-blur-sm bg-black text-white text-xs sm:text-base font-mono gap-5 p-10 sm:rounded-2xl m-auto">
+                <div class="col-span-full bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black rounded-2xl flex flex-col items-stretch gap-5 p-10">
+                    <div class="text-center text-3xl font-bold p-5">Pack Builder</div>
+                    <ol class="list-disc list-inside text-lg font-bold self-center">
+                        <li>From each section, select an option or choose None</li>
+                        <li>Once you reach the bottom, click download</li>
+                        <li>Your new pack will be compressed and downloaded</li>
+                    </ol>
+                </div>
+
+                {% for section in sections %}
+
+                    <!-- section header -->
+                    <div class="col-span-full bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm bg-black rounded-2xl flex flex-col items-stretch gap-2 p-10"> <!-- header / title for section -->
+                        <div class="text-center text-2xl font-bold">{{ section.title }}</div>
+                        <div class="text-center text-lg font-bold">{{ section.description }}</div>
+                    </div>
+
+                    {% if section.allow_none %}
+                        <div class="bg-opacity-30 max-h-fit shadow-lg shadow-black/50 backdrop-blur-sm bg-black rounded-2xl flex flex-col items-stretch gap-2 hover:ring-4 ring-blue-500/40">
+
+                            <p class="text-center text-md grow">None</p>
+
+                            <input type="checkbox" id="{{ section.title }}-none" name="{{ section.title }}" value="none" class="text-center self-center w-full hover:font-bold appearance-none bg-opacity-30 checked:border-4 border-blue-500 shadow-lg shadow-black/50 backdrop-blur-sm gap-6 flex-row flex bg-black p-6 hover:bg-white/30 rounded-2xl"/>
+                            <!-- <div class="text-center self-center w-full hover:font-bold bg-opacity-30 shadow-lg shadow-black/50 backdrop-blur-sm gap-6 flex-row flex bg-black p-6 hover:bg-white/30 rounded-2xl">
+                                <label for="{{ section.title }}-none" class="self-start">Select</label>
+                            </div> -->
+                        </div>
+                    {% endif %}
+
+                    {% for option in section.options %}
+                        {% include "packbuilder/option" %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </body>
+</html>

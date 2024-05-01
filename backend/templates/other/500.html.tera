@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Error 500</title>
+    <link href="/assets/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="fixed flex inset-0 justify-center bg-black z-[-1]">
+    <div class="bg-gradient-to-b from-slate-700 via-gray-900 to-slate-900 absolute inset-0"></div>
+</div>
+
+
+<div class="font-mono absolute text-white left-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4 bg-opacity-20 bg-black flex flex-col gap-10 p-10 rounded-2xl m-auto">
+    <div class="flex flex-col p-10 gap-5 text-center">
+        <div class="text-5xl text-white m-5">Error 500 :/</div>
+        <div class="text-xl">Congrats on breaking the server</div>
+        <div class="text-xl">Tell ZXQ5 to check his logs</div>
+        <a href="/" class="text-xl bg-opacity-40 backdrop-blur-sm bg-black p-4 hover:ring-4 ring-slate-400 rounded-md">Stop breaking my stuff...</a>
+    </div>
+</div>
+</body>
+</html>

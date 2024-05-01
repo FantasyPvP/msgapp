@@ -1,0 +1,147 @@
+[
+  {
+    "id": 0,
+    "name": "What is an example of a low level programming language?",
+    "options": ["C", "Python", "Java"],
+    "answer": 0
+  },
+  {
+    "id": 1,
+    "name": "Which is not an example of a systems level programming language?",
+    "options": ["Go", "Java", "Rust"],
+    "answer": 0
+  },
+  {
+    "id": 2,
+    "name": "Which of the following algorithsm is recursive?",
+    "options": [ 
+      "item = [item if item.name = searchterm for item in list][0]",
+      "sorted = lambda ls: [] if len(ls) == 0 else sorted([i for i in ls if i < ls[0]]) + [i for i in ls if i == ls[0]] + sorted([i for i in ls if i > ls[0]])" 
+    ],
+    "answer": 1
+  },
+  {
+    "id": 3,
+    "name": "What is a disadvantage of recursion?",
+    "options": [      
+      "Slower performance", 
+      "creates a less elegant solution to a problem",
+      "Often uses more memory than it's non recursive counterpart"
+    ],
+    "answer": 2
+  },
+  {
+    "id": 4,
+    "name": "What is not a common feature of a high level programming language?",
+    "options": [
+      "Garbage collector", 
+      "Direct hardware access", 
+      "dynamic typing"
+    ],
+    "answer": 1
+  },
+  {
+    "id": 5,
+    "name": "Select an appropriate use of assembly language",
+    "options": [
+      "Writing Security-critical operating system functions", 
+      "writing device drivers", 
+      "Writing games"
+    ],
+    "answer": 1
+  },
+  {
+    "id": 6,
+    "name": "In what situation would recursion be most appropriate?",
+    "options": [
+      "an algorithm where each iteration depends on the result of the previous", 
+      "an algorithm where many pieces of data are processed in parallel", 
+      "an algorithm where some tasks may be blocked and require waiting"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 7,
+    "name": "Manual memory management is a feature of:",
+    "options": ["High Level Languages", "Low Level Languages"],
+    "answer": 1
+  },
+  {
+    "id": 8,
+    "name": "What is a feature of the object oriented paradigm?",
+    "options": [
+      "Functions with no side-effects", 
+      "Encapsulation", 
+      "Common use of recursion"
+    ],
+    "answer": 1
+  },
+  {
+    "id": 9,
+    "name": "What feature is not generally present in object oriented programming languages?",
+    "options": ["Algebraic types such as enums", "Classes", "Functions"],
+    "answer": 0
+  },
+  {
+    "id": 10,
+    "name": "What is a key advantage of object oriented programming?",
+    "options": [
+      "Simpler code", 
+      "Being able to better represent real world data in code.", 
+      "Greater Performance"
+    ],
+    "answer": 1
+  },
+  {
+    "id": 11,
+    "name": "In what situation is event-driven programming not useful",
+    "options": [
+      "Kernel Interrupt handlers", 
+      "Game code", 
+      "Batch Processing systems",
+      "GUI Applications"
+    ],
+    "answer": 2
+  },
+  {
+    "id": 12,
+    "name": "What is the correct syntax for assignment in Backus Naur Form?",
+    "options": [
+      "value ::= othervalue",
+      "<value> ::= <othervalue>", 
+      "value => othervalue"
+    ],
+    "answer": 1
+  },
+  {
+    "id": 13,
+    "name": "What types of programming language is often interpreted?",
+    "options": [      
+      "Low Level", 
+      "High Level", 
+      "Machine Code"
+    ],
+    "answer": 1
+  },
+  {
+    "id": 14,
+    "name": "What is an advantage of purely functional programming?",
+    "options": [
+      "Asthetic code (readability)",
+      "The behaviour of code can be predicted mathematically", 
+      "Greater performance",     
+      "Simpler code (maintainability)"
+    ],
+    "answer": 1
+  },
+  {
+    "id": 15,
+    "name": "What best describes a Method in Object oriented programming",
+    "options": [
+      "a function that creates an instance of a class",       
+      "a function that only exists (is accessible) within the scope of it's class",
+      "a function that takes a reference to an instance of a class as a parameter"
+    ],
+    "answer": 2
+  }
+]
