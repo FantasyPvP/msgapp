@@ -8,13 +8,12 @@
   </head>
   <script>
     async function checkAnswer(question_id, response_id) {
-      const response = await fetch("http://localhost:8000/check/" + question_id + "/" + (response_id-1) ); // sub 1 since loops in tera are 1-indexed
+      const response = await fetch("https://fantasypvp.uk/check/" + question_id + "/" + (response_id-1) ); // sub 1 since loops in tera are 1-indexed
         
       var selected = document.getElementById(response_id);
       if (await response.json()) {        
         selected.style.backgroundColor = 'green';
         var title = document.getElementById('question');
-        title.innerHTML = title.innerHTML + "   ✅"
       } else {
         selected.style.backgroundColor = 'red';
       }

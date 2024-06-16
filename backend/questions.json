@@ -9,7 +9,7 @@
     "id": 1,
     "name": "Which is not an example of a systems level programming language?",
     "options": ["Go", "Java", "Rust"],
-    "answer": 0
+    "answer": 1
   },
   {
     "id": 2,
